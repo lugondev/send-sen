@@ -4,96 +4,67 @@ import (
 	"context"
 	"fmt"
 
+	brevo "github.com/getbrevo/brevo-go/lib"
+	"github.com/lugondev/send-sen/config"
 	"github.com/lugondev/send-sen/modules/sms/port"
 	"github.com/lugondev/send-sen/pkg/logger"
-	// TODO: Import Brevo SDK if available and needed for SMS
 )
 
-// BrevoSMSAdapter implements smsPort.SMSAdapter and ports.HealthChecker for Brevo SMS.
-type BrevoSMSAdapter struct {
-	apiKey      string
-	senderName  string // Optional: Sender name for SMS
-	logger      logger.Logger
-	serviceName string
-	// Brevo client if using SDK
+// BrevoAdapter implements the port.SmsAdapter interface for sending SMS via Brevo (formerly SendinBlue).
+type BrevoAdapter struct {
+	apiKey string
+	logger logger.Logger
+	client *brevo.APIClient
+	cfg    config.BrevoConfig
 }
 
-// BrevoSMSConfig holds configuration for the Brevo SMS adapter.
-// Ensure mapstructure tags match the config file structure.
-type BrevoSMSConfig struct {
-	APIKey     string `mapstructure:"api_key"`
-	SenderName string `mapstructure:"sender_name"` // Optional alphanumeric sender ID
-}
-
-// NewBrevoSMSAdapter creates a new Brevo SMS adapter.
-func NewBrevoSMSAdapter(config BrevoSMSConfig, logger logger.Logger) (port.SMSAdapter, error) {
-	if config.APIKey == "" {
-		return nil, fmt.Errorf("brevo API key is required for SMS adapter")
+// NewBrevoAdapter creates a new instance of BrevoAdapter.
+func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (port.SMSAdapter, error) {
+	if cfg.APIKey == "" {
+		return nil, fmt.Errorf("brevo API key is required")
 	}
 	namedLogger := logger.WithFields(map[string]any{
-		"service": "brevo_sms",
+		"service": "brevo_email",
 	})
-	adapter := &BrevoSMSAdapter{
-		apiKey:      config.APIKey,
-		senderName:  config.SenderName,
-		logger:      namedLogger,
-		serviceName: "brevo_sms",
+
+	brevoCfg := brevo.NewConfiguration()
+	// Configure API key authorization
+	brevoCfg.AddDefaultHeader("api-key", cfg.APIKey)
+	// Create new API client
+	apiClient := brevo.NewAPIClient(brevoCfg)
+
+	adapter := &BrevoAdapter{
+		apiKey: cfg.APIKey,
+		logger: namedLogger,
+		client: apiClient,
+		cfg:    cfg,
 	}
-	ctx := context.Background()
-	namedLogger.Info(ctx, "Brevo SMS adapter initialized", map[string]any{
-		"service_name": adapter.serviceName,
-		"sender_name":  adapter.senderName,
-	})
+	namedLogger.Info(context.Background(), "Brevo email adapter initialized")
 	return adapter, nil
 }
 
-// SendSMS sends an SMS using the Brevo API. Matches the smsPort.SMSAdapter interface.
-func (a *BrevoSMSAdapter) SendSMS(sms port.SMS) error {
-	// Use the sender name configured for the adapter if sms.From is empty
-	sender := a.senderName
-	if sms.From != "" {
-		sender = sms.From // Allow overriding sender per message if provided
-	}
-
-	a.logger.Info(context.Background(), "Attempting to send SMS via Brevo", map[string]any{
-		"to":             sms.To,
-		"message_length": len(sms.Message),
-		"sender":         sender,
+// SendSMS sends an SMS using the Brevo API.
+func (a *BrevoAdapter) SendSMS(ctx context.Context, sms port.SMS) error {
+	a.logger.Info(ctx, "Attempting to send SMS via Brevo", map[string]any{
+		"to":      sms.To,
+		"from":    a.cfg.SMSSender,
+		"message": sms.Message,
 	})
 
-	// --- Placeholder for Brevo SMS API Call ---
-	// TODO: Implement the actual API call to Brevo to send the SMS.
-	// This might involve using the Brevo SDK's transactional SMS endpoint
-	// or making a direct HTTP request.
-	/*
-		Example using hypothetical SDK:
-		smsData := brevoSDK.SendTransacSms{
-			Sender:    &sender, // Use the determined sender
-			Recipient: &sms.To,
-			Content:   &sms.Message,
-			// Type: "transactional", // or "marketing"
-		}
-		// Note: Context is not passed here, but SDK methods might take it. Adjust if needed.
-		_, response, err := a.client.TransactionalSMSApi.SendTransacSms(context.Background(), smsData) // Pass a background context for now
-		if err != nil {
-			// Handle error
-			return fmt.Errorf("brevo SMS API error: %w", err)
-		}
-		if response.StatusCode >= 300 {
-			// Handle non-success status
-			return fmt.Errorf("brevo SMS API returned status code %d", response.StatusCode)
-		}
-	*/
+	sendTransacSms := brevo.SendTransacSms{
+		// Sender - company or brand name (alphanumeric, max 11 chars) or phone number
+		Sender: a.cfg.SMSSender,
+		// Recipient's phone number with country code (e.g., "33612345678" for France)
+		Recipient: sms.To,
+		// SMS content
+		Content: sms.Message,
+	}
 
-	a.logger.Warn(context.Background(), "Brevo SendSMS function is not fully implemented yet.")
-	fmt.Printf("--- MOCK Brevo SMS Send ---\nTo: %s\nSender: %s\nMessage: %s\n-------------------------\n",
-		sms.To, sender, sms.Message)
-	// --- End Placeholder ---
+	// Send the SMS
+	if _, _, err := a.client.TransactionalSMSApi.SendTransacSms(ctx, sendTransacSms); err != nil {
+		fmt.Printf("Error sending SMS: %s\n", err.Error())
+		return err
+	}
 
-	return nil // Return nil for now
-}
-
-// ServiceName implements the ports.HealthChecker interface.
-func (a *BrevoSMSAdapter) ServiceName() string {
-	return a.serviceName
+	return nil
 }
