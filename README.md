@@ -1,6 +1,6 @@
 # Golang Send-Sen
 
-A comprehensive notification service library for Go applications, providing unified interfaces for Email, SMS, and various notification channels.
+A robust, modular notification service library for Go applications that provides unified interfaces for Email, SMS, and various notification channels. Built with extensibility in mind, it offers a clean architecture with adapters for popular service providers while maintaining flexibility for custom implementations.
 
 ## Installation
 
@@ -12,20 +12,20 @@ go get github.com/lugondev/send-sen
 
 ### Email Module ✉️
 - Integrated providers:
-  - ✅ SendGrid
-  - ✅ Brevo (formerly Sendinblue)
-  - ✅ Mock adapter (for testing)
+  - ✅ SendGrid - Enterprise-grade email delivery
+  - ✅ Brevo (formerly Sendinblue) - Comprehensive email marketing solution
+  - ✅ Mock adapter (for testing) - Simplifies unit testing
 
 ### SMS Module 📱
 - Integrated providers:
-  - ✅ Twilio
-  - ✅ Brevo SMS
+  - ✅ Twilio - Industry-standard SMS service
+  - ✅ Brevo SMS - Cost-effective SMS solution
 - Extensible adapter interface for custom providers
 
 ### Notification Module 🔔
 - Integrated providers:
-  - ✅ Telegram
-  - ✅ Mock logging (for testing)
+  - ✅ Telegram - Instant messaging platform integration
+  - ✅ Mock logging (for testing) - Facilitates testing scenarios
 - Flexible port interface for custom providers
 
 ## Project Structure
@@ -34,9 +34,84 @@ go get github.com/lugondev/send-sen
 .
 ├── modules/
 │   ├── email/         # Email service implementations
+│   │   ├── adapter/   # Email provider adapters
+│   │   ├── port/      # Email service interfaces
+│   │   └── service/   # Email service logic
 │   ├── sms/          # SMS service implementations
+│   │   ├── adapter/   # SMS provider adapters
+│   │   ├── port/      # SMS service interfaces
+│   │   └── service/   # SMS service logic
 │   └── notify/       # General notification services
-└── tests/            # Integration tests
+│       ├── adapter/   # Notification provider adapters
+│       ├── port/      # Notification service interfaces
+│       └── service/   # Notification service logic
+├── config/          # Configuration management
+└── tests/           # Integration tests
+```
+
+## Configuration
+
+### YAML Configuration
+Create a `config.yaml` file:
+
+```yaml
+app:
+    name: 'send-sen'
+log:
+    level: 'debug'    # debug, info, warn, error
+    format: 'console' # console, json
+
+sendgrid:
+    apiKey: 'your-sendgrid-api-key'
+    fromEmail: 'sender@example.com'
+    fromName: 'Sender Name'
+
+twilio:
+    accountSid: 'your-account-sid'
+    messagingSid: 'your-messaging-sid'
+    authToken: 'your-auth-token'
+    fromNumber: '+1234567890'
+
+brevo:
+    apiKey: 'your-brevo-api-key'
+    senderEmail: 'sender@example.com'
+    senderName: 'Sender Name'
+    smsSender: 'SMSSender'
+
+telegram:
+    botToken: 'your-bot-token'
+    chatId: 'your-chat-id'
+    debug: false
+
+adapter:
+    notify: 'telegram' # Default notification adapter
+    email: 'sendgrid'  # Default email adapter
+    sms: 'twilio'      # Default SMS adapter
+```
+
+### Code Configuration
+
+```go
+import "github.com/lugondev/send-sen/config"
+
+// Load configuration from config.yaml
+cfg := config.LoadConfig()
+
+// Or configure programmatically
+cfg := &config.Config{
+    Email: config.EmailConfig{
+        SendGridAPIKey: "your-sendgrid-key",
+        BrevoAPIKey:    "your-brevo-key",
+    },
+    SMS: config.SMSConfig{
+        TwilioAccountSID: "your-twilio-sid",
+        TwilioAuthToken:  "your-twilio-token",
+        BrevoAPIKey:      "your-brevo-key",
+    },
+    Notify: config.NotifyConfig{
+        TelegramBotToken: "your-telegram-token",
+    },
+}
 ```
 
 ## Usage
@@ -132,39 +207,49 @@ if err != nil {
 
 ## Testing
 
-The project includes mock adapters for testing:
+The project includes comprehensive testing support:
+
+### Mock Adapters
 - `mock_adapter.go` for email testing
+- `mock_adapter.go` for SMS testing
 - `mocklog_adapter.go` for notification testing
 
-Run tests:
+### Running Tests
+
 ```bash
+# Run all tests
 go test ./tests/...
+
+# Run specific module tests
+go test ./tests/email/...
+go test ./tests/sms/...
+go test ./tests/notify/...
+
+# Run with verbose output
+go test -v ./tests/...
+
+# Run with coverage
+go test -coverprofile=coverage.out ./tests/...
+go tool cover -html=coverage.out
 ```
 
-## Configuration
-
-Use the `config` package to manage your service configurations:
+### Writing Tests
 
 ```go
-import "github.com/lugondev/send-sen/config"
-
-// Load configuration
-cfg := config.LoadConfig()
-
-// Or configure manually
-cfg := &config.Config{
-    Email: config.EmailConfig{
-        SendGridAPIKey: "your-sendgrid-key",
-        BrevoAPIKey:    "your-brevo-key",
-    },
-    SMS: config.SMSConfig{
-        TwilioAccountSID: "your-twilio-sid",
-        TwilioAuthToken: "your-twilio-token",
-        BrevoAPIKey:     "your-brevo-key",
-    },
-    Notify: config.NotifyConfig{
-        TelegramBotToken: "your-telegram-token",
-    },
+// Example test using mock adapter
+func TestEmailService(t *testing.T) {
+    mockAdapter := adapter.NewMockAdapter()
+    emailService := service.NewEmailService(mockAdapter)
+    
+    params := &email.SendParams{
+        From:    "test@example.com",
+        To:      "recipient@example.com",
+        Subject: "Test",
+        Body:    "Test message",
+    }
+    
+    err := emailService.Send(context.Background(), params)
+    assert.NoError(t, err)
 }
 ```
 
@@ -184,21 +269,35 @@ cfg := &config.Config{
 #### Notification Services
 - [ ] Slack integration
 - [ ] Discord integration
+- [ ] Microsoft Teams integration
 
 #### Email Providers
 - [ ] Mailgun support
 - [ ] Mailchimp support
+- [ ] Amazon SES integration
 
 #### SMS & Push Notifications
-- [ ] Firebase Cloud Messaging (FCM) support
+- [ ] Firebase Cloud Messaging (FCM)
+- [ ] Vonage (formerly Nexmo)
+- [ ] MessageBird
 
 ## Contributing
 
-Contributions are welcome! Feel free to:
-- Implement any of the planned integrations
+We welcome contributions! Here's how you can help:
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+### Areas for Contribution
+- Implement planned integrations
+- Improve documentation
+- Add more test coverage
+- Optimize existing code
 - Report bugs
-- Suggest new features or integrations
-- Submit pull requests
+- Suggest new features
 
 ## License
 
