@@ -36,30 +36,6 @@ The project follows a clean architecture pattern:
 3. **Configuration**: Centralized configuration management using Viper
 4. **Testing**: Comprehensive test suite with mock adapters for testing
 
-## Project Structure
-
-```
-.
-├── adapters/               # Implementation of service adapters
-│   ├── email/              # Email provider adapters (SendGrid, Brevo, Mock)
-│   ├── notify/             # Notification provider adapters (Telegram, Mock)
-│   └── sms/                # SMS provider adapters (Twilio, Brevo, Mock)
-├── config/                 # Configuration management
-│   ├── config.go           # Configuration structures and loading logic
-│   ├── config.example.yaml # Example configuration file
-│   └── config.yaml         # Actual configuration file (gitignored)
-├── modules/                # Core business logic modules
-│   ├── email/              # Email service module
-│   ├── notify/             # Notification service module
-│   └── sms/                # SMS service module
-├── pkg/                    # Shared packages
-│   └── logger/             # Logging functionality
-└── tests/                  # Integration tests
-    ├── email/              # Email service tests
-    ├── notify/             # Notification service tests
-    └── sms/                # SMS service tests
-```
-
 ## Configuration
 
 ### YAML Configuration
@@ -72,22 +48,6 @@ The project includes comprehensive testing support:
 - Mock adapters in `adapters/email/mock.go` for email testing
 - Mock adapters in `adapters/sms/mock.go` for SMS testing
 - Mock adapters in `adapters/notify/mock.go` for notification testing
-
-### Running Tests
-
-```bash
-# Run all tests
-go test ./tests/...
-
-# Run specific module tests
-go test ./tests/email/...
-go test ./tests/sms/...
-go test ./tests/notify/...
-
-# Check test coverage for critical changes
-go test -coverprofile=coverage.out ./tests/...
-go tool cover -html=coverage.out
-```
 
 ## Code Style Guidelines
 
@@ -178,37 +138,3 @@ We welcome contributions! Here's how you can help:
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Examples & Tutorials
-
-### Email Module ✉️
-
-The Email module provides a simple way to send emails using different providers.
-
-#### Configuration
-
-You need to configure the Brevo API key in your `config.yaml` file:
-
-```yaml
-brevo:
-  api_key: YOUR_BREVO_API_KEY
-```
-
-### SMS Module 📱
-
-The SMS module allows you to send SMS messages using various providers.
-
-#### Configuration
-
-Configure the Twilio credentials in your `config.yaml` file:
-
-```yaml
-twilio:
-  account_sid: YOUR_TWILIO_ACCOUNT_SID
-  auth_token: YOUR_TWILIO_AUTH_TOKEN
-  from_number: YOUR_TWILIO_FROM_NUMBER
-```
-
-### Notification Module 🔔
-
-The Notification module provides a way to send notifications via different channels, such as Telegram.
