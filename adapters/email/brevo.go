@@ -1,12 +1,12 @@
-package adapter
+package email
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/modules/email"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/email/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/samber/lo"
 )
@@ -20,7 +20,7 @@ type BrevoAdapter struct {
 }
 
 // NewBrevoAdapter creates a new instance of BrevoAdapter.
-func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (port.EmailAdapter, error) {
+func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (email.EmailAdapter, error) {
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("brevo API key is required")
 	}
@@ -45,7 +45,7 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (port.EmailAd
 }
 
 // SendEmail sends an email using the Brevo API.
-func (a *BrevoAdapter) SendEmail(ctx context.Context, email port.Email) error {
+func (a *BrevoAdapter) SendEmail(ctx context.Context, email email.Email) error {
 	a.logger.Info(ctx, "Attempting to send email via Brevo", map[string]any{
 		"subject": email.Subject,
 		"to":      email.To,

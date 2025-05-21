@@ -12,6 +12,12 @@ type AppConfig struct {
 	Name string `mapstructure:"name"`
 }
 
+// LogConfig stores logging-specific configuration.
+type LogConfig struct {
+	Level  string `mapstructure:"level"`
+	Format string `mapstructure:"format"`
+}
+
 type NotifyChannel string
 
 const (
@@ -43,23 +49,6 @@ type AdapterConfig struct {
 	SMS    SMSProvider   `mapstructure:"sms"`
 }
 
-// LogConfig stores logging-specific configuration.
-type LogConfig struct {
-	Level  string `mapstructure:"level"`
-	Format string `mapstructure:"format"`
-}
-
-// Config stores all configuration of the application.
-type Config struct {
-	App      AppConfig      `mapstructure:"app"`
-	Log      LogConfig      `mapstructure:"log"`
-	Adapter  AdapterConfig  `mapstructure:"adapter"`
-	SendGrid SendGridConfig `mapstructure:"sendgrid"`
-	Twilio   TwilioConfig   `mapstructure:"twilio"`
-	Telegram TelegramConfig `mapstructure:"telegram"`
-	Brevo    BrevoConfig    `mapstructure:"brevo"`
-}
-
 // SendGridConfig holds SendGrid specific configuration.
 type SendGridConfig struct {
 	APIKey    string `mapstructure:"apiKey"`
@@ -88,6 +77,17 @@ type BrevoConfig struct {
 	SenderEmail string `mapstructure:"senderEmail"`
 	SenderName  string `mapstructure:"senderName"`
 	SMSSender   string `mapstructure:"smsSender"`
+}
+
+// Config stores all configuration of the application.
+type Config struct {
+	App      AppConfig      `mapstructure:"app"`
+	Log      LogConfig      `mapstructure:"log"`
+	Adapter  AdapterConfig  `mapstructure:"adapter"`
+	SendGrid SendGridConfig `mapstructure:"sendgrid"`
+	Twilio   TwilioConfig   `mapstructure:"twilio"`
+	Telegram TelegramConfig `mapstructure:"telegram"`
+	Brevo    BrevoConfig    `mapstructure:"brevo"`
 }
 
 // LoadConfig reads configuration from a YAML file or environment variables.

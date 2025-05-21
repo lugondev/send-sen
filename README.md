@@ -28,25 +28,36 @@ go get github.com/lugondev/send-sen
   - ✅ Mock logging (for testing) - Facilitates testing scenarios
 - Flexible port interface for custom providers
 
+## Architecture
+
+The project follows a clean architecture pattern:
+1. **Modules**: Contain the core business logic and define interfaces (ports)
+2. **Adapters**: Implement the interfaces defined by modules to connect with external services
+3. **Configuration**: Centralized configuration management using Viper
+4. **Testing**: Comprehensive test suite with mock adapters for testing
+
 ## Project Structure
 
 ```
 .
-├── modules/
-│   ├── email/         # Email service implementations
-│   │   ├── adapter/   # Email provider adapters
-│   │   ├── port/      # Email service interfaces
-│   │   └── service/   # Email service logic
-│   ├── sms/          # SMS service implementations
-│   │   ├── adapter/   # SMS provider adapters
-│   │   ├── port/      # SMS service interfaces
-│   │   └── service/   # SMS service logic
-│   └── notify/       # General notification services
-│       ├── adapter/   # Notification provider adapters
-│       ├── port/      # Notification service interfaces
-│       └── service/   # Notification service logic
-├── config/          # Configuration management
-└── tests/           # Integration tests
+├── adapters/               # Implementation of service adapters
+│   ├── email/              # Email provider adapters (SendGrid, Brevo, Mock)
+│   ├── notify/             # Notification provider adapters (Telegram, Mock)
+│   └── sms/                # SMS provider adapters (Twilio, Brevo, Mock)
+├── config/                 # Configuration management
+│   ├── config.go           # Configuration structures and loading logic
+│   ├── config.example.yaml # Example configuration file
+│   └── config.yaml         # Actual configuration file (gitignored)
+├── modules/                # Core business logic modules
+│   ├── email/              # Email service module
+│   ├── notify/             # Notification service module
+│   └── sms/                # SMS service module
+├── pkg/                    # Shared packages
+│   └── logger/             # Logging functionality
+└── tests/                  # Integration tests
+    ├── email/              # Email service tests
+    ├── notify/             # Notification service tests
+    └── sms/                # SMS service tests
 ```
 
 ## Configuration
@@ -54,165 +65,13 @@ go get github.com/lugondev/send-sen
 ### YAML Configuration
 Create a `config.yaml` file:
 
-```yaml
-app:
-    name: 'send-sen'
-log:
-    level: 'debug'    # debug, info, warn, error
-    format: 'console' # console, json
-
-sendgrid:
-    apiKey: 'your-sendgrid-api-key'
-    fromEmail: 'sender@example.com'
-    fromName: 'Sender Name'
-
-twilio:
-    accountSid: 'your-account-sid'
-    messagingSid: 'your-messaging-sid'
-    authToken: 'your-auth-token'
-    fromNumber: '+1234567890'
-
-brevo:
-    apiKey: 'your-brevo-api-key'
-    senderEmail: 'sender@example.com'
-    senderName: 'Sender Name'
-    smsSender: 'SMSSender'
-
-telegram:
-    botToken: 'your-bot-token'
-    chatId: 'your-chat-id'
-    debug: false
-
-adapter:
-    notify: 'telegram' # Default notification adapter
-    email: 'sendgrid'  # Default email adapter
-    sms: 'twilio'      # Default SMS adapter
-```
-
-### Code Configuration
-
-```go
-import "github.com/lugondev/send-sen/config"
-
-// Load configuration from config.yaml
-cfg := config.LoadConfig()
-
-// Or configure programmatically
-cfg := &config.Config{
-    Email: config.EmailConfig{
-        SendGridAPIKey: "your-sendgrid-key",
-        BrevoAPIKey:    "your-brevo-key",
-    },
-    SMS: config.SMSConfig{
-        TwilioAccountSID: "your-twilio-sid",
-        TwilioAuthToken:  "your-twilio-token",
-        BrevoAPIKey:      "your-brevo-key",
-    },
-    Notify: config.NotifyConfig{
-        TelegramBotToken: "your-telegram-token",
-    },
-}
-```
-
-## Usage
-
-### Email Service
-
-```go
-import (
-    "context"
-    "github.com/lugondev/send-sen/modules/email/service"
-    "github.com/lugondev/send-sen/modules/email/adapter"
-)
-
-// 1. Initialize email adapter (SendGrid example)
-emailAdapter := adapter.NewSendGridAdapter(apiKey)
-
-// 2. Create email service
-emailService := service.NewEmailService(emailAdapter)
-
-// 3. Prepare email parameters
-emailParams := &email.SendParams{
-    From:    "sender@example.com",
-    To:      "recipient@example.com",
-    Subject: "Test Email",
-    Body:    "This is a test email",
-}
-
-// 4. Send email
-err := emailService.Send(context.Background(), emailParams)
-if err != nil {
-    log.Fatal(err)
-}
-```
-
-### SMS Service
-
-```go
-import (
-    "context"
-    "github.com/lugondev/send-sen/modules/sms/service"
-)
-
-// 1. Configure SMS service
-config := &sms.Config{
-    APIKey:    "your-api-key",
-    APISecret: "your-api-secret",
-}
-
-// 2. Initialize SMS service (Brevo example)
-smsService := service.NewBrevoService(config)
-
-// 3. Prepare SMS parameters
-smsParams := &sms.SendParams{
-    From:    "+1234567890",
-    To:      "+0987654321",
-    Message: "Test SMS message",
-}
-
-// 4. Send SMS
-err := smsService.Send(context.Background(), smsParams)
-if err != nil {
-    log.Fatal(err)
-}
-```
-
-### Notification Service (Telegram)
-
-```go
-import (
-    "context"
-    "github.com/lugondev/send-sen/modules/notify/service"
-    "github.com/lugondev/send-sen/modules/notify/adapter"
-)
-
-// 1. Initialize Telegram adapter
-telegramAdapter := adapter.NewTelegramAdapter(botToken)
-
-// 2. Create notification service
-notifyService := service.NewNotifyService(telegramAdapter)
-
-// 3. Prepare notification parameters
-notifyParams := &notify.SendParams{
-    ChatID:  "your-chat-id",
-    Message: "Test notification",
-}
-
-// 4. Send notification
-err := notifyService.Send(context.Background(), notifyParams)
-if err != nil {
-    log.Fatal(err)
-}
-```
-
 ## Testing
-
 The project includes comprehensive testing support:
 
 ### Mock Adapters
-- `mock_adapter.go` for email testing
-- `mock_adapter.go` for SMS testing
-- `mocklog_adapter.go` for notification testing
+- Mock adapters in `adapters/email/mock.go` for email testing
+- Mock adapters in `adapters/sms/mock.go` for SMS testing
+- Mock adapters in `adapters/notify/mock.go` for notification testing
 
 ### Running Tests
 
@@ -225,32 +84,49 @@ go test ./tests/email/...
 go test ./tests/sms/...
 go test ./tests/notify/...
 
-# Run with verbose output
-go test -v ./tests/...
-
-# Run with coverage
+# Check test coverage for critical changes
 go test -coverprofile=coverage.out ./tests/...
 go tool cover -html=coverage.out
 ```
 
-### Writing Tests
+## Code Style Guidelines
 
-```go
-// Example test using mock adapter
-func TestEmailService(t *testing.T) {
-    mockAdapter := adapter.NewMockAdapter()
-    emailService := service.NewEmailService(mockAdapter)
-    
-    params := &email.SendParams{
-        From:    "test@example.com",
-        To:      "recipient@example.com",
-        Subject: "Test",
-        Body:    "Test message",
-    }
-    
-    err := emailService.Send(context.Background(), params)
-    assert.NoError(t, err)
-}
+1. Follow Go's standard code style and conventions
+2. Use meaningful variable and function names
+3. Add appropriate comments for public functions and complex logic
+4. Implement proper error handling and logging
+5. Keep functions small and focused on a single responsibility
+6. Write unit tests for new functionality
+
+## Implementation Guidelines
+
+### For new adapters
+- Implement the appropriate interface from the modules package
+- Add comprehensive logging
+- Include proper error handling
+- Add tests in the tests directory
+
+### For bug fixes
+- Identify the root cause
+- Add tests that reproduce the issue
+- Fix the issue
+- Verify that the tests pass
+
+### For refactoring
+- Ensure all tests pass before and after changes
+- Maintain backward compatibility when possible
+- Update documentation if interfaces change
+
+## Building and Running
+
+The project is a library, so there's no need to build it separately. However, when testing changes:
+
+```bash
+# Verify that the code compiles
+go build ./...
+
+# Run tests
+go test ./tests/...
 ```
 
 ## Provider Status

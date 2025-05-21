@@ -1,11 +1,11 @@
-package adapter
+package email
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/modules/email"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/email/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 
 	"github.com/sendgrid/sendgrid-go"
@@ -23,7 +23,7 @@ type SendGridAdapter struct {
 
 // NewSendGridAdapter creates a new instance of SendGridAdapter.
 // Returns both email adapter and health checker interfaces.
-func NewSendGridAdapter(cfg config.SendGridConfig, logger logger.Logger) (port.EmailAdapter, error) {
+func NewSendGridAdapter(cfg config.SendGridConfig, logger logger.Logger) (email.EmailAdapter, error) {
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("SendGrid API key is required")
 	}
@@ -52,7 +52,7 @@ func NewSendGridAdapter(cfg config.SendGridConfig, logger logger.Logger) (port.E
 }
 
 // SendEmail sends an email using the SendGrid API.
-func (a *SendGridAdapter) SendEmail(ctx context.Context, email port.Email) error {
+func (a *SendGridAdapter) SendEmail(ctx context.Context, email email.Email) error {
 	a.logger.Info(ctx, "Attempting to send email via SendGrid", map[string]any{
 		"subject": email.Subject,
 		"to":      email.To,

@@ -2,11 +2,11 @@ package notify_test
 
 import (
 	"context"
+	"github.com/lugondev/send-sen/adapters/notify"
+	notify2 "github.com/lugondev/send-sen/modules/notify"
 	"testing"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/notify/adapter"
-	"github.com/lugondev/send-sen/modules/notify/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -25,17 +25,17 @@ func TestTelegramSendNotification_RealConfig(t *testing.T) {
 	mockLogger, err := logger.NewZapLogger(cfg)
 	assert.NoError(t, err)
 
-	telegramCfg := adapter.TelegramConfig{
+	telegramCfg := notify.TelegramConfig{
 		BotToken: cfg.Telegram.BotToken,
 		ChatID:   cfg.Telegram.ChatID,
 		Debug:    cfg.Telegram.Debug,
 	}
 
-	telegramAdapter, err := adapter.NewTelegramAdapter(telegramCfg, mockLogger)
+	telegramAdapter, err := notify.NewTelegramAdapter(telegramCfg, mockLogger)
 	assert.NoError(t, err)
 
 	// Test with explicit recipient
-	err = telegramAdapter.Send(context.Background(), port.Content{
+	err = telegramAdapter.Send(context.Background(), notify2.Content{
 		Subject: "Test Subject",
 		Message: "Test message with subject from automated test",
 	})

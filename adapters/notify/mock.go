@@ -1,9 +1,9 @@
-package adapter
+package notify
 
 import (
 	"context"
+	"github.com/lugondev/send-sen/modules/notify"
 
-	"github.com/lugondev/send-sen/modules/notify/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 )
 
@@ -13,7 +13,7 @@ type MockLogAdapter struct {
 }
 
 // NewMockLogAdapter creates a new instance of MockLogAdapter.
-func NewMockLogAdapter(logger logger.Logger) port.NotifyAdapter {
+func NewMockLogAdapter(logger logger.Logger) notify.NotifyAdapter {
 	namedLogger := logger.WithFields(map[string]any{
 		"service": "mocklog_notify_adapter",
 	})
@@ -24,7 +24,7 @@ func NewMockLogAdapter(logger logger.Logger) port.NotifyAdapter {
 }
 
 // Send logs the notification details.
-func (a *MockLogAdapter) Send(ctx context.Context, notification port.Content) error {
+func (a *MockLogAdapter) Send(ctx context.Context, notification notify.Content) error {
 	a.logger.Info(ctx, "--- MOCK Notification Sent (via Log) ---", map[string]any{
 		"subject": notification.Subject,
 		"message": notification.Message,

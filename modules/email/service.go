@@ -1,24 +1,23 @@
-package service
+package email
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/adapters/email"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/email/adapter"
-	"github.com/lugondev/send-sen/modules/email/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 )
 
 // emailService implements the EmailService interface.
 type emailService struct {
-	adapter port.EmailAdapter
+	adapter EmailAdapter
 	logger  logger.Logger
 	name    config.EmailProvider
 }
 
 // NewEmailService creates a new instance of EmailService.
-func NewEmailService(cfg config.Config, logger logger.Logger) port.EmailService {
+func NewEmailService(cfg config.Config, logger logger.Logger) (EmailService, error) {
 	namedLogger := logger.WithFields(map[string]any{
 		"service": "email_service_" + cfg.Adapter.Email,
 	})
@@ -26,9 +25,9 @@ func NewEmailService(cfg config.Config, logger logger.Logger) port.EmailService 
 	namedLogger.Debug(ctx, "Registered email adapter", map[string]any{
 		"adapter": cfg.Adapter.Email,
 	})
-	var emailAdapter port.EmailAdapter
+	var emailAdapter EmailAdapter
 	if cfg.Adapter.Email == config.EmailBrevo {
-		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, namedLogger)
+		brevoAdapter, err := email.NewBrevoAdapter(cfg.Brevo, namedLogger)
 		if err != nil {
 			namedLogger.Error(ctx, "Failed to create Brevo adapter", map[string]any{
 				"error": err,
@@ -38,7 +37,7 @@ func NewEmailService(cfg config.Config, logger logger.Logger) port.EmailService 
 			namedLogger.Info(ctx, "Using Brevo adapter for email sending")
 		}
 	} else if cfg.Adapter.Email == config.EmailSendGrid {
-		sendgridAdapter, err := adapter.NewSendGridAdapter(cfg.SendGrid, namedLogger)
+		sendgridAdapter, err := email.NewSendGridAdapter(cfg.SendGrid, namedLogger)
 		if err != nil {
 			namedLogger.Error(ctx, "Failed to create SendGrid adapter", map[string]any{
 				"error": err,
@@ -49,18 +48,18 @@ func NewEmailService(cfg config.Config, logger logger.Logger) port.EmailService 
 		}
 	}
 	if emailAdapter == nil {
-		emailAdapter = adapter.NewMockEmailAdapter(namedLogger)
+		emailAdapter = email.NewMockEmailAdapter(namedLogger)
 		namedLogger.Info(ctx, "Using MockEmail adapter for email sending")
 	}
 
 	return &emailService{
 		adapter: emailAdapter,
 		logger:  logger,
-	}
+	}, nil
 }
 
 // SendEmail delegates the email sending task to the configured adapter.
-func (s *emailService) SendEmail(ctx context.Context, email port.Email) error {
+func (s *emailService) SendEmail(ctx context.Context, email Email) error {
 	if len(email.To) == 0 {
 		return fmt.Errorf("email must have at least one recipient")
 	}

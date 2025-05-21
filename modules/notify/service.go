@@ -1,27 +1,25 @@
-package service
+package notify
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/adapters/notify"
 
 	"github.com/lugondev/send-sen/config"
 	"github.com/lugondev/send-sen/pkg/logger"
-
-	"github.com/lugondev/send-sen/modules/notify/adapter"
-	"github.com/lugondev/send-sen/modules/notify/port"
 )
 
 // notifyService implements the NotifyService interface.
 // It holds a map of registered adapters keyed by channel name.
 type notifyService struct {
-	adapter port.NotifyAdapter
+	adapter NotifyAdapter
 	logger  logger.Logger
 	ctx     context.Context
 	name    config.NotifyChannel
 }
 
 // NewNotifyService creates a new instance of NotifyService.
-func NewNotifyService(cfg config.Config, logger logger.Logger) (port.NotifyService, error) {
+func NewNotifyService(cfg config.Config, logger logger.Logger) (NotifyService, error) {
 	namedLogger := logger.WithFields(map[string]any{
 		"service": "notify_service_" + cfg.Adapter.Notify,
 	})
@@ -31,9 +29,9 @@ func NewNotifyService(cfg config.Config, logger logger.Logger) (port.NotifyServi
 		"channel": cfg.Adapter.Notify,
 	})
 
-	var notifyAdapter port.NotifyAdapter
+	var notifyAdapter NotifyAdapter
 	if cfg.Adapter.Notify == config.NotifyTelegram {
-		telegramAdapter, err := adapter.NewTelegramAdapter(adapter.TelegramConfig{
+		telegramAdapter, err := notify.NewTelegramAdapter(notify.TelegramConfig{
 			BotToken: cfg.Telegram.BotToken,
 			ChatID:   cfg.Telegram.ChatID,
 			Debug:    cfg.Telegram.Debug,
@@ -50,7 +48,7 @@ func NewNotifyService(cfg config.Config, logger logger.Logger) (port.NotifyServi
 			"chat_id": cfg.Telegram.ChatID,
 		})
 	} else {
-		notifyAdapter = adapter.NewMockLogAdapter(namedLogger)
+		notifyAdapter = notify.NewMockLogAdapter(namedLogger)
 		namedLogger.Info(ctx, "Using MockLog adapter for notifications", map[string]any{
 			"channel": cfg.Adapter.Notify,
 		})
@@ -65,7 +63,7 @@ func NewNotifyService(cfg config.Config, logger logger.Logger) (port.NotifyServi
 }
 
 // Send finds the appropriate adapter based on the notification's channel
-func (s *notifyService) Send(ctx context.Context, content port.Content) error {
+func (s *notifyService) Send(ctx context.Context, content Content) error {
 	if content.Message == "" {
 		return fmt.Errorf("notification message cannot be empty")
 	}

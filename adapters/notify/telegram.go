@@ -1,11 +1,11 @@
-package adapter
+package notify
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/modules/notify"
 	"strconv"
 
-	"github.com/lugondev/send-sen/modules/notify/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -30,7 +30,7 @@ type TelegramConfig struct {
 // NewTelegramAdapter creates a new Telegram adapter.
 // Returns both port.NotifyAdapter and ports.HealthChecker.
 // Consider splitting initialization if only one interface is needed sometimes.
-func NewTelegramAdapter(config TelegramConfig, logger logger.Logger) (port.NotifyAdapter, error) {
+func NewTelegramAdapter(config TelegramConfig, logger logger.Logger) (notify.NotifyAdapter, error) {
 	if config.BotToken == "" {
 		return nil, fmt.Errorf("telegram bot token is required")
 	}
@@ -64,7 +64,7 @@ func NewTelegramAdapter(config TelegramConfig, logger logger.Logger) (port.Notif
 }
 
 // Send a message via Telegram using the library.
-func (a *TelegramAdapter) Send(ctx context.Context, notification port.Content) error {
+func (a *TelegramAdapter) Send(ctx context.Context, notification notify.Content) error {
 
 	// Message content can use Subject and Body combined, or just Body
 	// For simplicity, using Body for now. Could be enhanced based on notification structure.

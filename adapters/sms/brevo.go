@@ -1,12 +1,12 @@
-package adapter
+package sms
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/modules/sms"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/sms/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 )
 
@@ -19,7 +19,7 @@ type BrevoAdapter struct {
 }
 
 // NewBrevoAdapter creates a new instance of BrevoAdapter.
-func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (port.SMSAdapter, error) {
+func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (sms.SMSAdapter, error) {
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("brevo API key is required")
 	}
@@ -44,7 +44,7 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (port.SMSAdap
 }
 
 // SendSMS sends an SMS using the Brevo API.
-func (a *BrevoAdapter) SendSMS(ctx context.Context, sms port.SMS) error {
+func (a *BrevoAdapter) SendSMS(ctx context.Context, sms sms.SMS) error {
 	a.logger.Info(ctx, "Attempting to send SMS via Brevo", map[string]any{
 		"to":      sms.To,
 		"from":    a.cfg.SMSSender,

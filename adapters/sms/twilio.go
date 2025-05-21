@@ -1,12 +1,12 @@
-package adapter
+package sms
 
 import (
 	"context"
 	"fmt"
+	"github.com/lugondev/send-sen/modules/sms"
 	"net/url"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/sms/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
@@ -22,7 +22,7 @@ type TwilioAdapter struct {
 
 // NewTwilioAdapter creates a new instance of TwilioAdapter.
 // Returns both SMS adapter and health checker interfaces.
-func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (port.SMSAdapter, error) {
+func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (sms.SMSAdapter, error) {
 	if cfg.AccountSid == "" || cfg.AuthToken == "" {
 		return nil, fmt.Errorf("twilio Account SID and Auth Token are required")
 	}
@@ -51,7 +51,7 @@ func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (port.SMSAd
 }
 
 // SendSMS sends an SMS using the Twilio Messages API.
-func (a *TwilioAdapter) SendSMS(ctx context.Context, sms port.SMS) error {
+func (a *TwilioAdapter) SendSMS(ctx context.Context, sms sms.SMS) error {
 	params := &twilioApi.CreateMessageParams{
 		To:   &sms.To,
 		From: &a.cfg.FromNumber,

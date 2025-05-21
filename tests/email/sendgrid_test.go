@@ -2,11 +2,11 @@ package email
 
 import (
 	"context"
+	"github.com/lugondev/send-sen/adapters/email"
+	email2 "github.com/lugondev/send-sen/modules/email"
 	"testing"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/modules/email/adapter"
-	"github.com/lugondev/send-sen/modules/email/port"
 	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
@@ -20,11 +20,11 @@ func TestNewSendgridAdapter(t *testing.T) {
 	log, err := logger.NewZapLogger(cfg)
 	assert.NoError(t, err, "Failed to create logger")
 
-	sendgridAdapter, err := adapter.NewSendGridAdapter(cfg.SendGrid, log)
+	sendgridAdapter, err := email.NewSendGridAdapter(cfg.SendGrid, log)
 	assert.NoError(t, err, "Failed to create SendGrid adapter")
 	assert.NotNil(t, sendgridAdapter, "SendGrid adapter should not be nil")
 
-	err = sendgridAdapter.SendEmail(context.Background(), port.Email{
+	err = sendgridAdapter.SendEmail(context.Background(), email2.Email{
 		To:      []string{"lugondev@gmail.com"},
 		Subject: "Test Email",
 		Body:    "This is a test email",
