@@ -1,0 +1,37 @@
+# Application Environment: development, staging, production
+app:
+    name: 'send-sen'
+log:
+    level: 'debug' # "debug", "info", "warn", "error"
+    format: 'console' # "console", "json"
+
+# SendGrid Configuration (Nested)
+sendgrid:
+    apiKey: 'your-sendgrid-api-key'
+    fromEmail: 'your-sender@example.com'
+    fromName: 'Your Name'
+
+# Twilio Configuration (Nested)
+twilio:
+    accountSid: 'your-twilio-account-sid'
+    messagingSid: 'your-twilio-messaging-sid'
+    authToken: 'your-twilio-auth-token'
+    fromNumber: '+1234567890'
+
+# Brevo Configuration (Nested)
+brevo:
+    apiKey: 'your-brevo-api-key'
+    senderEmail: 'your-sender@example.com'
+    senderName: 'Your Name'
+    smsSender: 'YourSMSSender' # The name that appears as the sender for SMS
+
+# Telegram Configuration (Nested)
+telegram:
+    botToken: 'your-telegram-bot-token' # Your Telegram Bot Token (Set via ENV var TELEGRAM_BOTTOKEN is recommended)
+    chatId: 'your-telegram-chat-id'
+    debug: false
+
+adapter:
+    notify: 'telegram'
+    email: 'sendgrid'
+    sms: 'twilio'
