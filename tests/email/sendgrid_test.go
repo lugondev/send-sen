@@ -3,7 +3,6 @@ package email
 import (
 	"context"
 	"github.com/lugondev/send-sen/adapters/email"
-	email2 "github.com/lugondev/send-sen/modules/email"
 	"testing"
 
 	"github.com/lugondev/send-sen/config"
@@ -24,9 +23,9 @@ func TestNewSendgridAdapter(t *testing.T) {
 	assert.NoError(t, err, "Failed to create SendGrid adapter")
 	assert.NotNil(t, sendgridAdapter, "SendGrid adapter should not be nil")
 
-	err = sendgridAdapter.SendEmail(context.Background(), email2.Email{
+	err = sendgridAdapter.SendEmail(context.Background(), email.Email{
 		To:      []string{"lugondev@gmail.com"},
-		Subject: "Test Email",
+		Subject: "Test Message",
 		Body:    "This is a test email",
 		Html:    "<p>This is a test email</p>",
 	})

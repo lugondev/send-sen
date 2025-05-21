@@ -1,24 +1,21 @@
 package email
 
-import "context"
+import (
+	"context"
+	adapter "github.com/lugondev/send-sen/adapters/email"
+)
 
-// Email represents the email data structure.
-type Email struct {
-	To      []string
-	Cc      []string
-	Bcc     []string
-	Subject string
-	Html    string
-	Body    string
+// Adapter defines the interface for sending emails via different providers.
+type Adapter interface {
+	SendEmail(ctx context.Context, email adapter.Email) error
 }
 
-// EmailAdapter defines the interface for sending emails via different providers.
-type EmailAdapter interface {
-	SendEmail(ctx context.Context, email Email) error
-}
-
-// EmailService defines the core logic for handling emails.
-type EmailService interface {
-	SendEmail(ctx context.Context, email Email) error
+// Service defines the core logic for handling emails.
+type Service interface {
+	SendEmail(ctx context.Context, email adapter.Email) error
+	SendPasswordReset(ctx context.Context, to string, link string) error
+	SendVerificationCode(ctx context.Context, to string, code string) error
+	SendWelcome(ctx context.Context, to string, name string) error
+	SendWarningLogin(ctx context.Context, to string, location string, time string) error
 	ServiceName() string
 }

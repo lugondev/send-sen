@@ -3,31 +3,31 @@ package sms
 import (
 	"context"
 	"fmt"
-	"github.com/lugondev/send-sen/adapters/sms"
+	adapter "github.com/lugondev/send-sen/adapters/sms"
 
 	"github.com/lugondev/send-sen/config"
 	"github.com/lugondev/send-sen/pkg/logger"
 )
 
-// smsService implements the SMSService interface.
+// smsService implements the Service interface.
 type smsService struct {
-	adapter SMSAdapter
+	adapter Adapter
 	logger  logger.Logger
 	name    config.SMSProvider
 	from    string
 }
 
-// NewSMSService creates a new instance of SMSService.
-// It requires an SMSAdapter to be provided.
-func NewSMSService(cfg config.Config, logger logger.Logger) (SMSService, error) {
+// NewSMSService creates a new instance of Service.
+// It requires an Adapter to be provided.
+func NewSMSService(cfg config.Config, logger logger.Logger) (Service, error) {
 	namedLogger := logger.WithFields(map[string]any{
 		"service": "sms_service_" + cfg.Adapter.SMS,
 	})
 	ctx := context.Background()
-	var smsAdapter SMSAdapter
+	var smsAdapter Adapter
 	var from string
 	if cfg.Adapter.SMS == config.SMSProviderBrevo {
-		brevoAdapter, err := sms.NewBrevoAdapter(cfg.Brevo, namedLogger)
+		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, namedLogger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create Brevo SMS adapter: %w", err)
 		}
@@ -35,7 +35,7 @@ func NewSMSService(cfg config.Config, logger logger.Logger) (SMSService, error) 
 		namedLogger.Info(ctx, "Using Brevo adapter for SMS sending")
 		smsAdapter = brevoAdapter
 	} else if cfg.Adapter.SMS == config.SMSProviderTwilio {
-		twilioAdapter, err := sms.NewTwilioAdapter(cfg.Twilio, namedLogger)
+		twilioAdapter, err := adapter.NewTwilioAdapter(cfg.Twilio, namedLogger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create Twilio SMS adapter: %w", err)
 		}
@@ -44,7 +44,7 @@ func NewSMSService(cfg config.Config, logger logger.Logger) (SMSService, error) 
 		smsAdapter = twilioAdapter
 	}
 	if smsAdapter == nil {
-		smsAdapter = sms.NewMockSMSAdapter(namedLogger)
+		smsAdapter = adapter.NewMockSMSAdapter(namedLogger)
 		namedLogger.Info(ctx, "Using MockSMS adapter for SMS sending")
 		from = "MockSender"
 	}
@@ -58,8 +58,8 @@ func NewSMSService(cfg config.Config, logger logger.Logger) (SMSService, error) 
 	}, nil
 }
 
-// SendSMS validates the SMS data and delegates the sending task to the adapter.
-func (s *smsService) SendSMS(ctx context.Context, sms SMS) error {
+// Send validates the SMS data and delegates the sending task to the adapter.
+func (s *smsService) Send(ctx context.Context, sms adapter.SMS) error {
 	if sms.To == "" {
 		return fmt.Errorf("sms recipient ('To' phone number) cannot be empty")
 	}
@@ -76,7 +76,7 @@ func (s *smsService) SendSMS(ctx context.Context, sms SMS) error {
 	})
 
 	// Delegate to the adapter
-	err := s.adapter.SendSMS(ctx, sms)
+	err := s.adapter.Send(ctx, sms)
 	if err != nil {
 		s.logger.Error(ctx, "Failed to send SMS via adapter", map[string]any{"error": err})
 		return fmt.Errorf("failed to send SMS via adapter: %w", err)
@@ -84,6 +84,22 @@ func (s *smsService) SendSMS(ctx context.Context, sms SMS) error {
 
 	s.logger.Info(ctx, "SMS potentially sent successfully via adapter", map[string]any{"to": sms.To})
 	return nil
+}
+
+// SendCode sends an SMS with a verification code.
+func (s *smsService) SendCode(ctx context.Context, to string, code string) error {
+	s.logger.Info(ctx, "Sending verification code via SMS", map[string]any{
+		"to": to,
+	})
+
+	// Create the SMS message
+	message := adapter.SMS{
+		To:      to,
+		Message: fmt.Sprintf("Your verification code is: %s. This code will expire in 10 minutes.", code),
+	}
+
+	// Send the SMS
+	return s.Send(ctx, message)
 }
 
 // ServiceName returns the name of the SMS service.

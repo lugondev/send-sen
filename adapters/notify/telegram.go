@@ -3,7 +3,8 @@ package notify
 import (
 	"context"
 	"fmt"
-	"github.com/lugondev/send-sen/modules/notify"
+	"github.com/lugondev/send-sen/config"
+	"golang.org/x/net/html"
 	"strconv"
 
 	"github.com/lugondev/send-sen/pkg/logger"
@@ -19,18 +20,10 @@ type TelegramAdapter struct {
 	serviceName string
 }
 
-// TelegramConfig holds configuration for the Telegram adapter.
-// TODO: Consider adding an 'Enabled' flag here for explicit control.
-type TelegramConfig struct {
-	BotToken string
-	ChatID   string
-	Debug    bool // Optional: Enable debug mode for the bot API
-}
-
 // NewTelegramAdapter creates a new Telegram adapter.
 // Returns both port.NotifyAdapter and ports.HealthChecker.
 // Consider splitting initialization if only one interface is needed sometimes.
-func NewTelegramAdapter(config TelegramConfig, logger logger.Logger) (notify.NotifyAdapter, error) {
+func NewTelegramAdapter(config config.TelegramConfig, logger logger.Logger) (*TelegramAdapter, error) {
 	if config.BotToken == "" {
 		return nil, fmt.Errorf("telegram bot token is required")
 	}
@@ -64,25 +57,43 @@ func NewTelegramAdapter(config TelegramConfig, logger logger.Logger) (notify.Not
 }
 
 // Send a message via Telegram using the library.
-func (a *TelegramAdapter) Send(ctx context.Context, notification notify.Content) error {
-
-	// Message content can use Subject and Body combined, or just Body
-	// For simplicity, using Body for now. Could be enhanced based on notification structure.
-	messageText := notification.Message
-	if notification.Subject != "" {
-		messageText = fmt.Sprintf("Subject: %s\n\n%s", notification.Subject, notification.Message)
+func (a *TelegramAdapter) Send(ctx context.Context, msg Content) error {
+	// 1) Fallback parse-mode
+	if msg.ParseMode == "" {
+		msg.ParseMode = tgbotapi.ModeHTML
 	}
 
-	// Create the message object
-	msg := tgbotapi.NewMessage(a.chatID, messageText)
-	// Consider adding ParseMode (HTML or MarkdownV2) based on notification needs/data
-	msg.ParseMode = tgbotapi.ModeHTML // Example
+	// 2) Pick icon
+	levelIcon := map[Level]string{
+		Debug:   "🔍",
+		Info:    "ℹ️",
+		Warning: "⚠️",
+		Error:   "❌",
+	}[msg.Level]
+	if levelIcon == "" {
+		levelIcon = "📢"
+	}
 
-	// Send the message
-	if _, sendErr := a.bot.Send(msg); sendErr != nil {
-		a.logger.Error(ctx, "Error sending message via Telegram library", map[string]any{"chat_id": a.chatID, "error": sendErr})
+	// 3) Build safe HTML (no <span>, no style)
+	subject := html.EscapeString(msg.Subject)
+	body := html.EscapeString(msg.Message)
+
+	var text string
+	if subject != "" {
+		text = fmt.Sprintf("<b>%s %s</b>\n\n<pre>%s</pre>\n\n<i>Level: %s</i>",
+			levelIcon, subject, body, msg.Level)
 	} else {
-		a.logger.Debug(ctx, "Message sent successfully via Telegram library", map[string]any{"chat_id": a.chatID})
+		text = fmt.Sprintf("<b>%s Notification</b>\n\n<pre>%s</pre>\n\n<i>Level: %s</i>",
+			levelIcon, body, msg.Level)
 	}
+
+	m := tgbotapi.NewMessage(a.chatID, text)
+	m.ParseMode = msg.ParseMode
+
+	if _, err := a.bot.Send(m); err != nil {
+		a.logger.Error(ctx, "telegram send failed", map[string]any{"error": err})
+		return err
+	}
+	a.logger.Debug(ctx, "telegram send ok", nil)
 	return nil
 }

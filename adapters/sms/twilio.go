@@ -3,7 +3,6 @@ package sms
 import (
 	"context"
 	"fmt"
-	"github.com/lugondev/send-sen/modules/sms"
 	"net/url"
 
 	"github.com/lugondev/send-sen/config"
@@ -12,17 +11,16 @@ import (
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 
-// TwilioAdapter implements the port.SMSAdapter and ports.HealthChecker interfaces using the Twilio API.
+// TwilioAdapter implements the port.Adapter and ports.HealthChecker interfaces using the Twilio API.
 type TwilioAdapter struct {
-	client      *twilio.RestClient
-	cfg         config.TwilioConfig
-	logger      logger.Logger
-	serviceName string
+	client *twilio.RestClient
+	cfg    config.TwilioConfig
+	logger logger.Logger
 }
 
 // NewTwilioAdapter creates a new instance of TwilioAdapter.
 // Returns both SMS adapter and health checker interfaces.
-func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (sms.SMSAdapter, error) {
+func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (*TwilioAdapter, error) {
 	if cfg.AccountSid == "" || cfg.AuthToken == "" {
 		return nil, fmt.Errorf("twilio Account SID and Auth Token are required")
 	}
@@ -40,18 +38,17 @@ func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (sms.SMSAda
 		Password: cfg.AuthToken,
 	})
 	adapter := &TwilioAdapter{
-		client:      client,
-		cfg:         cfg,
-		logger:      namedLogger,
-		serviceName: "twilio_sms",
+		client: client,
+		cfg:    cfg,
+		logger: namedLogger,
 	}
 	ctx := context.Background()
 	namedLogger.Info(ctx, "Twilio SMS adapter initialized")
 	return adapter, nil
 }
 
-// SendSMS sends an SMS using the Twilio Messages API.
-func (a *TwilioAdapter) SendSMS(ctx context.Context, sms sms.SMS) error {
+// Send sends an SMS using the Twilio Messages API.
+func (a *TwilioAdapter) Send(ctx context.Context, sms SMS) error {
 	params := &twilioApi.CreateMessageParams{
 		To:   &sms.To,
 		From: &a.cfg.FromNumber,
@@ -92,9 +89,4 @@ func (a *TwilioAdapter) SendSMS(ctx context.Context, sms sms.SMS) error {
 	}
 
 	return nil
-}
-
-// ServiceName implements the ports.HealthChecker interface.
-func (a *TwilioAdapter) ServiceName() string {
-	return a.serviceName
 }

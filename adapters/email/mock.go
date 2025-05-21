@@ -3,7 +3,6 @@ package email
 import (
 	"context"
 	"fmt"
-	"github.com/lugondev/send-sen/modules/email"
 
 	"github.com/lugondev/send-sen/pkg/logger"
 )
@@ -14,7 +13,7 @@ type MockEmailAdapter struct {
 }
 
 // NewMockEmailAdapter creates a new instance of MockEmailAdapter.
-func NewMockEmailAdapter(logger logger.Logger) email.EmailAdapter {
+func NewMockEmailAdapter(logger logger.Logger) *MockEmailAdapter {
 	namedLogger := logger.WithFields(map[string]any{
 		"service": "mock_email",
 	})
@@ -27,7 +26,7 @@ func NewMockEmailAdapter(logger logger.Logger) email.EmailAdapter {
 }
 
 // SendEmail sends an email using the mock implementation.
-func (a *MockEmailAdapter) SendEmail(ctx context.Context, email email.Email) error {
+func (a *MockEmailAdapter) SendEmail(ctx context.Context, email Email) error {
 	// Placeholder implementation (remove once real implementation is added)
 	a.logger.Warn(ctx, "Mock SendEmail function is not fully implemented yet.")
 	fmt.Printf("--- MOCK Brevo Send ---\nTo: %v\nCc: %v\nBcc: %v\nSubject: %s\nBody: %s\n-----------------------\n",

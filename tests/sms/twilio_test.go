@@ -2,8 +2,7 @@ package sms_test
 
 import (
 	"context"
-	"github.com/lugondev/send-sen/adapters/sms"
-	sms2 "github.com/lugondev/send-sen/modules/sms"
+	adapter "github.com/lugondev/send-sen/adapters/sms"
 	"testing"
 
 	"github.com/lugondev/send-sen/config"
@@ -20,14 +19,14 @@ func TestTwilioAdapter_SendSMS(t *testing.T) {
 	assert.NoError(t, err, "Failed to create logger")
 
 	// Create adapter instance
-	twilioAdapter, err := sms.NewTwilioAdapter(cfg.Twilio, log)
+	twilioAdapter, err := adapter.NewTwilioAdapter(cfg.Twilio, log)
 	assert.NoError(t, err)
 
-	sms := sms2.SMS{
-		To:      "+18777804236", // Example  number
+	sms := adapter.SMS{
+		To:      "+18777804236", // Example number
 		Message: "Test SMS from Twilio 123123",
 	}
 
-	err = twilioAdapter.SendSMS(context.Background(), sms)
+	err = twilioAdapter.Send(context.Background(), sms)
 	assert.NoError(t, err)
 }

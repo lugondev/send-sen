@@ -1,21 +1,20 @@
 package notify
 
-import "context"
+import (
+	"context"
+	adapter "github.com/lugondev/send-sen/adapters/notify"
+)
 
-// Content represents the data structure for a generic notification.
-// We might need more specific structures or fields depending on the channel.
-type Content struct {
-	Subject string
-	Message string
+// Adapter defines the interface for sending notifications via different providers/channels.
+type Adapter interface {
+	Send(ctx context.Context, content adapter.Content) error
 }
 
-// NotifyAdapter defines the interface for sending notifications via different providers/channels.
-type NotifyAdapter interface {
-	Send(ctx context.Context, content Content) error
-}
-
-// NotifyService defines the core logic for handling notifications.
-type NotifyService interface {
-	Send(ctx context.Context, content Content) error
+// Service defines the core logic for handling notifications.
+type Service interface {
+	Send(ctx context.Context, content adapter.Content) error
+	Alert(ctx context.Context, subject, message string) error
+	Info(ctx context.Context, subject, message string) error
+	Notify(ctx context.Context, subject, message string, level adapter.Level) error
 	ServiceName() string
 }
