@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/samber/lo"
 )
 

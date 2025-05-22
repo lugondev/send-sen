@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"net/url"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )

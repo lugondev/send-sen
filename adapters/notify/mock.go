@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/send-sen/pkg/logger"
+	"github.com/lugondev/go-log"
 )
 
 // MockLogAdapter implements the port.NotifyAdapter interface by logging notifications.
@@ -59,7 +59,7 @@ func (a *MockLogAdapter) Send(ctx context.Context, msg Content) error {
 
 	a.logger.Info(ctx, "--- MOCK Notification Sent (via Log) ---", map[string]any{
 		"formatted_message": formattedMessage,
-		"level": string(msg.Level),
+		"level":             string(msg.Level),
 	})
 	return nil
 }

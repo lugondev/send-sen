@@ -7,8 +7,8 @@ import (
 	adapter "github.com/lugondev/send-sen/adapters/email"
 	"html/template"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 )
 
 // emailService implements the Service interface.

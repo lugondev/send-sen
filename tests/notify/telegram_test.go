@@ -4,9 +4,9 @@ import (
 	"context"
 	"testing"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/adapters/notify"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -21,7 +21,11 @@ func TestTelegramSendNotification_RealConfig(t *testing.T) {
 	cfg, err := config.LoadConfig("../../config")
 	assert.NoError(t, err)
 
-	mockLogger, err := logger.NewZapLogger(cfg)
+	mockLogger, err := logger.NewLogger(&logger.Option{
+		Format:       cfg.Log.Format,
+		ScopeName:    "send-sen",
+		ScopeVersion: "v0.1.1",
+	})
 	assert.NoError(t, err)
 
 	telegramAdapter, err := notify.NewTelegramAdapter(cfg.Telegram, mockLogger)

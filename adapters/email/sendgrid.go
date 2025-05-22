@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"

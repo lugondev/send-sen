@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 )
 
 // BrevoAdapter implements the port.SmsAdapter interface for sending SMS via Brevo (formerly SendinBlue).

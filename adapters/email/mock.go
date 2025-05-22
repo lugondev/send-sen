@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/send-sen/pkg/logger"
+	"github.com/lugondev/go-log"
 )
 
 // MockEmailAdapter is a mock implementation of the port.EmailAdapter interface.

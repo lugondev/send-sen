@@ -5,8 +5,8 @@ import (
 	"fmt"
 	adapter "github.com/lugondev/send-sen/adapters/notify"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 )
 
 // notifyService implements the Service interface.

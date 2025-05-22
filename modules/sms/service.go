@@ -5,8 +5,8 @@ import (
 	"fmt"
 	adapter "github.com/lugondev/send-sen/adapters/sms"
 
+	"github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/pkg/logger"
 )
 
 // smsService implements the Service interface.

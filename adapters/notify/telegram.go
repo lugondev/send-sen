@@ -7,7 +7,7 @@ import (
 	"golang.org/x/net/html"
 	"strconv"
 
-	"github.com/lugondev/send-sen/pkg/logger"
+	"github.com/lugondev/go-log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
