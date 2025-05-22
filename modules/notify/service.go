@@ -19,10 +19,6 @@ type notifyService struct {
 
 // NewNotifyService creates a new instance of Service.
 func NewNotifyService(cfg config.Config, logger logger.Logger) (Service, error) {
-	namedLogger := logger.WithFields(map[string]any{
-		"service": "notify_service_" + cfg.Adapter.Notify,
-	})
-
 	ctx := context.Background()
 	logger.Debug(ctx, "Registered notify adapter", map[string]any{
 		"channel": cfg.Adapter.Notify,
@@ -30,30 +26,32 @@ func NewNotifyService(cfg config.Config, logger logger.Logger) (Service, error) 
 
 	var notifyAdapter Adapter
 	if cfg.Adapter.Notify == config.NotifyTelegram {
-		telegramAdapter, err := adapter.NewTelegramAdapter(cfg.Telegram, namedLogger)
+		telegramAdapter, err := adapter.NewTelegramAdapter(cfg.Telegram, logger)
 		if err != nil {
-			namedLogger.Error(ctx, "Failed to create Telegram adapter", map[string]any{
+			logger.Error(ctx, "Failed to create Telegram adapter", map[string]any{
 				"error": err,
 			})
 			return nil, fmt.Errorf("failed to create Telegram adapter: %w", err)
 		} else {
 			notifyAdapter = telegramAdapter
-			namedLogger.Info(ctx, "Using Telegram adapter for notifications", map[string]any{
+			logger.Info(ctx, "Using Telegram adapter for notifications", map[string]any{
 				"chat_id": cfg.Telegram.ChatID,
 			})
 		}
 	}
 	if notifyAdapter == nil {
-		notifyAdapter = adapter.NewMockLogAdapter(namedLogger)
-		namedLogger.Info(ctx, "Using MockLog adapter for notifications", map[string]any{
+		notifyAdapter = adapter.NewMockLogAdapter(logger)
+		logger.Info(ctx, "Using MockLog adapter for notifications", map[string]any{
 			"channel": cfg.Adapter.Notify,
 		})
 	}
 
 	return &notifyService{
 		adapter: notifyAdapter,
-		logger:  namedLogger,
-		name:    cfg.Adapter.Notify,
+		logger: logger.WithFields(map[string]any{
+			"service": "notify_service_" + cfg.Adapter.Notify,
+		}),
+		name: cfg.Adapter.Notify,
 	}, nil
 }
 

@@ -28,10 +28,8 @@ func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (*TwilioAda
 		return nil, fmt.Errorf("either Twilio Messaging Service SID or From Number is required")
 	}
 	namedLogger := logger.WithFields(map[string]any{
-		"service":       "twilio_sms",
-		"account_sid":   cfg.AccountSid,
-		"messaging_sid": cfg.MessagingSid,
-		"from_number":   cfg.FromNumber,
+		"service":     "twilio_sms",
+		"from_number": cfg.FromNumber,
 	})
 	client := twilio.NewRestClientWithParams(twilio.ClientParams{
 		Username: cfg.AccountSid,

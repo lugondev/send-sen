@@ -20,45 +20,44 @@ type emailService struct {
 
 // NewEmailService creates a new instance of Service.
 func NewEmailService(cfg config.Config, logger logger.Logger) (Service, error) {
-	namedLogger := logger.WithFields(map[string]any{
-		"service": "email_service_" + cfg.Adapter.Email,
-	})
 	ctx := context.Background()
-	namedLogger.Debug(ctx, "Registered email adapter", map[string]any{
+	logger.Debug(ctx, "Registered email adapter", map[string]any{
 		"adapter": cfg.Adapter.Email,
 	})
 
 	var emailAdapter Adapter
 	if cfg.Adapter.Email == config.EmailBrevo {
-		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, namedLogger)
+		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)
 		if err != nil {
-			namedLogger.Error(ctx, "Failed to create Brevo adapter", map[string]any{
+			logger.Error(ctx, "Failed to create Brevo adapter", map[string]any{
 				"error": err,
 			})
 		} else {
 			emailAdapter = brevoAdapter
-			namedLogger.Info(ctx, "Using Brevo adapter for email sending")
+			logger.Info(ctx, "Using Brevo adapter for email sending")
 		}
 	} else if cfg.Adapter.Email == config.EmailSendGrid {
-		sendgridAdapter, err := adapter.NewSendGridAdapter(cfg.SendGrid, namedLogger)
+		sendgridAdapter, err := adapter.NewSendGridAdapter(cfg.SendGrid, logger)
 		if err != nil {
-			namedLogger.Error(ctx, "Failed to create SendGrid adapter", map[string]any{
+			logger.Error(ctx, "Failed to create SendGrid adapter", map[string]any{
 				"error": err,
 			})
 		} else {
 			emailAdapter = sendgridAdapter
-			namedLogger.Info(ctx, "Using SendGrid adapter for email sending")
+			logger.Info(ctx, "Using SendGrid adapter for email sending")
 		}
 	}
 	if emailAdapter == nil {
-		emailAdapter = adapter.NewMockEmailAdapter(namedLogger)
-		namedLogger.Info(ctx, "Using MockEmail adapter for email sending")
+		emailAdapter = adapter.NewMockEmailAdapter(logger)
+		logger.Info(ctx, "Using MockEmail adapter for email sending")
 	}
 
 	return &emailService{
 		adapter: emailAdapter,
-		logger:  logger,
-		name:    cfg.Adapter.Email,
+		logger: logger.WithFields(map[string]any{
+			"service": "email_service_" + cfg.Adapter.Email,
+		}),
+		name: cfg.Adapter.Email,
 	}, nil
 }
 

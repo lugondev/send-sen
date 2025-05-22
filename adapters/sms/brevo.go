@@ -22,10 +22,6 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (*BrevoAdapte
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("brevo API key is required")
 	}
-	namedLogger := logger.WithFields(map[string]any{
-		"service": "brevo_email",
-	})
-
 	brevoCfg := brevo.NewConfiguration()
 	// Configure API key authorization
 	brevoCfg.AddDefaultHeader("api-key", cfg.APIKey)
@@ -34,11 +30,11 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (*BrevoAdapte
 
 	adapter := &BrevoAdapter{
 		apiKey: cfg.APIKey,
-		logger: namedLogger,
+		logger: logger,
 		client: apiClient,
 		cfg:    cfg,
 	}
-	namedLogger.Info(context.Background(), "Brevo email adapter initialized")
+	logger.Info(context.Background(), "Brevo SMS adapter initialized")
 	return adapter, nil
 }
 

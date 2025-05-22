@@ -20,41 +20,40 @@ type smsService struct {
 // NewSMSService creates a new instance of Service.
 // It requires an Adapter to be provided.
 func NewSMSService(cfg config.Config, logger logger.Logger) (Service, error) {
-	namedLogger := logger.WithFields(map[string]any{
-		"service": "sms_service_" + cfg.Adapter.SMS,
-	})
 	ctx := context.Background()
 	var smsAdapter Adapter
 	var from string
 	if cfg.Adapter.SMS == config.SMSProviderBrevo {
-		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, namedLogger)
+		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create Brevo SMS adapter: %w", err)
 		}
 		from = cfg.Brevo.SMSSender
-		namedLogger.Info(ctx, "Using Brevo adapter for SMS sending")
+		logger.Info(ctx, "Using Brevo adapter for SMS sending")
 		smsAdapter = brevoAdapter
 	} else if cfg.Adapter.SMS == config.SMSProviderTwilio {
-		twilioAdapter, err := adapter.NewTwilioAdapter(cfg.Twilio, namedLogger)
+		twilioAdapter, err := adapter.NewTwilioAdapter(cfg.Twilio, logger)
 		if err != nil {
 			return nil, fmt.Errorf("failed to create Twilio SMS adapter: %w", err)
 		}
 		from = cfg.Twilio.FromNumber
-		namedLogger.Info(ctx, "Using Twilio adapter for SMS sending")
+		logger.Info(ctx, "Using Twilio adapter for SMS sending")
 		smsAdapter = twilioAdapter
 	}
 	if smsAdapter == nil {
-		smsAdapter = adapter.NewMockSMSAdapter(namedLogger)
-		namedLogger.Info(ctx, "Using MockSMS adapter for SMS sending")
+		smsAdapter = adapter.NewMockSMSAdapter(logger)
+		logger.Info(ctx, "Using MockSMS adapter for SMS sending")
 		from = "MockSender"
 	}
-	namedLogger.Info(ctx, "SMS service initialized")
+	logger.Info(ctx, "SMS service initialized")
 
 	return &smsService{
 		adapter: smsAdapter,
-		logger:  namedLogger,
-		name:    cfg.Adapter.SMS,
-		from:    from,
+		logger: logger.WithFields(map[string]any{
+			"service": "sms_service_" + cfg.Adapter.SMS,
+		}),
+		name: cfg.Adapter.SMS,
+		from: from,
 	}, nil
 }
 
