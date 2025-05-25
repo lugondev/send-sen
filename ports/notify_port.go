@@ -3,7 +3,7 @@ package ports
 import (
 	"context"
 
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 )
 
 // NotifyAdapter defines the interface for sending notifications via different providers/channels.

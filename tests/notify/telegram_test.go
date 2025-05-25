@@ -7,7 +7,7 @@ import (
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/adapters/notify"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 	"github.com/stretchr/testify/assert"
 )
 

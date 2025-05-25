@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	logger "github.com/lugondev/go-log"
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 )
 
 // MockLogAdapter implements the port.NotifyAdapter interface by logging notifications.

@@ -1,4 +1,4 @@
-package email
+package services
 
 import (
 	"bytes"
@@ -7,8 +7,8 @@ import (
 	"html/template"
 
 	adapter "github.com/lugondev/send-sen/adapters/email"
-	"github.com/lugondev/send-sen/domain/dto"
-	"github.com/lugondev/send-sen/domain/ports"
+	"github.com/lugondev/send-sen/dto"
+	"github.com/lugondev/send-sen/ports"
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"

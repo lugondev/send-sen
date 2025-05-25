@@ -7,7 +7,7 @@ import (
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )

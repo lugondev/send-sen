@@ -1,4 +1,4 @@
-package email
+package services
 
 // ---------- Inline templates (demo) ----------
 // In a real project, you can load templates from files or embed them.

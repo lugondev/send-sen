@@ -6,7 +6,7 @@ import (
 	"strconv"
 
 	"github.com/lugondev/send-sen/config"
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 	"golang.org/x/net/html"
 
 	logger "github.com/lugondev/go-log"

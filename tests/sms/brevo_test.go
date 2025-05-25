@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	adapter "github.com/lugondev/send-sen/adapters/sms"
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"

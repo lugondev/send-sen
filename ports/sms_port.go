@@ -3,7 +3,7 @@ package ports
 import (
 	"context"
 
-	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/dto"
 )
 
 // SMSAdapter defines the interface for sending SMS messages via different providers.
