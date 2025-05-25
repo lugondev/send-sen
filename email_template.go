@@ -1,4 +1,4 @@
-package main
+package sen
 
 // ---------- Inline templates (demo) ----------
 // In a real project, you can load templates from files or embed them.
