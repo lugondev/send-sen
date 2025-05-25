@@ -1,4 +1,4 @@
-package services
+package main
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	adapter "github.com/lugondev/send-sen/adapters/sms"
 	"github.com/lugondev/send-sen/dto"
-	"github.com/lugondev/send-sen/ports"
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
@@ -14,7 +13,7 @@ import (
 
 // smsService implements the Service interface.
 type smsService struct {
-	adapter ports.SMSAdapter
+	adapter SMSAdapter
 	logger  logger.Logger
 	name    config.SMSProvider
 	from    string
@@ -22,9 +21,9 @@ type smsService struct {
 
 // NewSMSService creates a new instance of Service.
 // It requires an Adapter to be provided.
-func NewSMSService(cfg config.Config, logger logger.Logger) (ports.SMSService, error) {
+func NewSMSService(cfg config.Config, logger logger.Logger) (SMSService, error) {
 	ctx := context.Background()
-	var smsAdapter ports.SMSAdapter
+	var smsAdapter SMSAdapter
 	var from string
 	if cfg.Adapter.SMS == config.SMSProviderBrevo {
 		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)

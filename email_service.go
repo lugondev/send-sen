@@ -1,4 +1,4 @@
-package services
+package main
 
 import (
 	"bytes"
@@ -6,9 +6,8 @@ import (
 	"fmt"
 	"html/template"
 
-	adapter "github.com/lugondev/send-sen/adapters/email"
+	"github.com/lugondev/send-sen/adapters/email"
 	"github.com/lugondev/send-sen/dto"
-	"github.com/lugondev/send-sen/ports"
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
@@ -16,21 +15,21 @@ import (
 
 // emailService implements the Service interface.
 type emailService struct {
-	adapter ports.EmailAdapter
+	adapter EmailAdapter
 	logger  logger.Logger
 	name    config.EmailProvider
 }
 
 // NewEmailService creates a new instance of Service.
-func NewEmailService(cfg config.Config, logger logger.Logger) (ports.EmailService, error) {
+func NewEmailService(cfg config.Config, logger logger.Logger) (EmailService, error) {
 	ctx := context.Background()
 	logger.Debug(ctx, "Registered email adapter", map[string]any{
 		"adapter": cfg.Adapter.Email,
 	})
 
-	var emailAdapter ports.EmailAdapter
+	var emailAdapter EmailAdapter
 	if cfg.Adapter.Email == config.EmailBrevo {
-		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)
+		brevoAdapter, err := email.NewBrevoAdapter(cfg.Brevo, logger)
 		if err != nil {
 			logger.Error(ctx, "Failed to create Brevo adapter", map[string]any{
 				"error": err,
@@ -40,7 +39,7 @@ func NewEmailService(cfg config.Config, logger logger.Logger) (ports.EmailServic
 			logger.Info(ctx, "Using Brevo adapter for email sending")
 		}
 	} else if cfg.Adapter.Email == config.EmailSendGrid {
-		sendgridAdapter, err := adapter.NewSendGridAdapter(cfg.SendGrid, logger)
+		sendgridAdapter, err := email.NewSendGridAdapter(cfg.SendGrid, logger)
 		if err != nil {
 			logger.Error(ctx, "Failed to create SendGrid adapter", map[string]any{
 				"error": err,
@@ -51,7 +50,7 @@ func NewEmailService(cfg config.Config, logger logger.Logger) (ports.EmailServic
 		}
 	}
 	if emailAdapter == nil {
-		emailAdapter = adapter.NewMockEmailAdapter(logger)
+		emailAdapter = email.NewMockEmailAdapter(logger)
 		logger.Info(ctx, "Using MockEmail adapter for email sending")
 	}
 

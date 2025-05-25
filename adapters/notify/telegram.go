@@ -22,9 +22,7 @@ type TelegramAdapter struct {
 	serviceName string
 }
 
-// NewTelegramAdapter creates a new Telegram adapter.
-// Returns both port.NotifyAdapter and ports.HealthChecker.
-// Consider splitting initialization if only one interface is needed sometimes.
+// NewTelegramAdapter creates a new instance of TelegramAdapter.
 func NewTelegramAdapter(config config.TelegramConfig, logger logger.Logger) (*TelegramAdapter, error) {
 	if config.BotToken == "" {
 		return nil, fmt.Errorf("telegram bot token is required")

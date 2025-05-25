@@ -12,7 +12,7 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-// SendGridAdapter implements the port.EmailAdapter and ports.HealthChecker interfaces using the SendGrid API.
+// SendGridAdapter implements the port.EmailAdapter interface for sending emails via SendGrid.
 type SendGridAdapter struct {
 	apiKey      string
 	client      *sendgrid.Client
@@ -22,7 +22,6 @@ type SendGridAdapter struct {
 }
 
 // NewSendGridAdapter creates a new instance of SendGridAdapter.
-// Returns both email adapter and health checker interfaces.
 func NewSendGridAdapter(cfg config.SendGridConfig, logger logger.Logger) (*SendGridAdapter, error) {
 	if cfg.APIKey == "" {
 		return nil, fmt.Errorf("SendGrid API key is required")
@@ -116,7 +115,7 @@ func (a *SendGridAdapter) SendEmail(ctx context.Context, email dto.Email) error 
 	return nil
 }
 
-// ServiceName implements the ports.HealthChecker interface.
+// ServiceName returns the name of the email service.
 func (a *SendGridAdapter) ServiceName() string {
 	return a.serviceName
 }

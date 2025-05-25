@@ -1,4 +1,4 @@
-package services
+package main
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	adapter "github.com/lugondev/send-sen/adapters/notify"
 	"github.com/lugondev/send-sen/dto"
-	"github.com/lugondev/send-sen/ports"
 
 	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
@@ -15,19 +14,19 @@ import (
 // notifyService implements the Service interface.
 // It holds a map of registered adapters keyed by channel name.
 type notifyService struct {
-	adapter ports.NotifyAdapter
+	adapter NotifyAdapter
 	logger  logger.Logger
 	name    config.NotifyChannel
 }
 
 // NewNotifyService creates a new instance of Service.
-func NewNotifyService(cfg config.Config, logger logger.Logger) (ports.NotifyService, error) {
+func NewNotifyService(cfg config.Config, logger logger.Logger) (NotifyService, error) {
 	ctx := context.Background()
 	logger.Debug(ctx, "Registered notify adapter", map[string]any{
 		"channel": cfg.Adapter.Notify,
 	})
 
-	var notifyAdapter ports.NotifyAdapter
+	var notifyAdapter NotifyAdapter
 	if cfg.Adapter.Notify == config.NotifyTelegram {
 		telegramAdapter, err := adapter.NewTelegramAdapter(cfg.Telegram, logger)
 		if err != nil {

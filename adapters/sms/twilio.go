@@ -12,7 +12,7 @@ import (
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )
 
-// TwilioAdapter implements the port.Adapter and ports.HealthChecker interfaces using the Twilio API.
+// TwilioAdapter implements the port.SMSAdapter interface for sending SMS via Twilio.
 type TwilioAdapter struct {
 	client *twilio.RestClient
 	cfg    config.TwilioConfig
@@ -20,7 +20,6 @@ type TwilioAdapter struct {
 }
 
 // NewTwilioAdapter creates a new instance of TwilioAdapter.
-// Returns both SMS adapter and health checker interfaces.
 func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (*TwilioAdapter, error) {
 	if cfg.AccountSid == "" || cfg.AuthToken == "" {
 		return nil, fmt.Errorf("twilio Account SID and Auth Token are required")
