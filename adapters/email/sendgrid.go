@@ -4,8 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
 
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -51,7 +52,7 @@ func NewSendGridAdapter(cfg config.SendGridConfig, logger logger.Logger) (*SendG
 }
 
 // SendEmail sends an email using the SendGrid API.
-func (a *SendGridAdapter) SendEmail(ctx context.Context, email Email) error {
+func (a *SendGridAdapter) SendEmail(ctx context.Context, email dto.Email) error {
 	a.logger.Info(ctx, "Attempting to send email via SendGrid", map[string]any{
 		"subject": email.Subject,
 		"to":      email.To,

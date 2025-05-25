@@ -4,9 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/adapters/notify"
 	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -32,26 +33,26 @@ func TestTelegramSendNotification_RealConfig(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Test with explicit recipient
-	err = telegramAdapter.Send(context.Background(), notify.Content{
+	err = telegramAdapter.Send(context.Background(), dto.Content{
 		Subject: "Test Subject",
 		Message: "Test message with subject from automated test",
 	})
 	assert.NoError(t, err)
 
 	// Test with level and parse mode
-	err = telegramAdapter.Send(context.Background(), notify.Content{
+	err = telegramAdapter.Send(context.Background(), dto.Content{
 		Subject:   "Error Alert",
 		Message:   "This is a test error message with formatting",
-		Level:     notify.Error,
+		Level:     dto.Error,
 		ParseMode: "HTML",
 	})
 	assert.NoError(t, err)
 
 	// Test with warning level
-	err = telegramAdapter.Send(context.Background(), notify.Content{
+	err = telegramAdapter.Send(context.Background(), dto.Content{
 		Subject: "Warning Notice",
 		Message: "This is a test warning message",
-		Level:   notify.Warning,
+		Level:   dto.Warning,
 	})
 	assert.NoError(t, err)
 }

@@ -3,15 +3,18 @@ package sms
 import (
 	"context"
 	"fmt"
-	adapter "github.com/lugondev/send-sen/adapters/sms"
 
-	"github.com/lugondev/go-log"
+	adapter "github.com/lugondev/send-sen/adapters/sms"
+	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/domain/ports"
+
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
 )
 
 // smsService implements the Service interface.
 type smsService struct {
-	adapter Adapter
+	adapter ports.SMSAdapter
 	logger  logger.Logger
 	name    config.SMSProvider
 	from    string
@@ -19,9 +22,9 @@ type smsService struct {
 
 // NewSMSService creates a new instance of Service.
 // It requires an Adapter to be provided.
-func NewSMSService(cfg config.Config, logger logger.Logger) (Service, error) {
+func NewSMSService(cfg config.Config, logger logger.Logger) (ports.SMSService, error) {
 	ctx := context.Background()
-	var smsAdapter Adapter
+	var smsAdapter ports.SMSAdapter
 	var from string
 	if cfg.Adapter.SMS == config.SMSProviderBrevo {
 		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)
@@ -58,7 +61,7 @@ func NewSMSService(cfg config.Config, logger logger.Logger) (Service, error) {
 }
 
 // Send validates the SMS data and delegates the sending task to the adapter.
-func (s *smsService) Send(ctx context.Context, sms adapter.SMS) error {
+func (s *smsService) Send(ctx context.Context, sms dto.SMS) error {
 	if sms.To == "" {
 		return fmt.Errorf("sms recipient ('To' phone number) cannot be empty")
 	}
@@ -92,7 +95,7 @@ func (s *smsService) SendCode(ctx context.Context, to string, code string) error
 	})
 
 	// Create the SMS message
-	message := adapter.SMS{
+	message := dto.SMS{
 		To:      to,
 		Message: fmt.Sprintf("Your verification code is: %s. This code will expire in 10 minutes.", code),
 	}

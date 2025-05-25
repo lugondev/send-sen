@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
+	"github.com/lugondev/send-sen/domain/dto"
 )
 
 // MockSMSAdapter is a mock implementation of the port.EmailAdapter interface.
@@ -25,7 +26,7 @@ func NewMockSMSAdapter(logger logger.Logger) *MockSMSAdapter {
 }
 
 // Send sends an SMS using the mock implementation.
-func (a *MockSMSAdapter) Send(ctx context.Context, sms SMS) error {
+func (a *MockSMSAdapter) Send(ctx context.Context, sms dto.SMS) error {
 	// Placeholder implementation (remove once real implementation is added)
 	a.logger.Warn(ctx, "Mock SendSMS function is not fully implemented yet.")
 	fmt.Printf("--- MOCK SMS Send ---\nTo: %v\nMessage: %s\n-----------------------\n",

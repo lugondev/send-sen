@@ -3,11 +3,13 @@ package notify
 import (
 	"context"
 	"fmt"
-	"github.com/lugondev/send-sen/config"
-	"golang.org/x/net/html"
 	"strconv"
 
-	"github.com/lugondev/go-log"
+	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
+	"golang.org/x/net/html"
+
+	logger "github.com/lugondev/go-log"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
@@ -57,18 +59,18 @@ func NewTelegramAdapter(config config.TelegramConfig, logger logger.Logger) (*Te
 }
 
 // Send a message via Telegram using the library.
-func (a *TelegramAdapter) Send(ctx context.Context, msg Content) error {
+func (a *TelegramAdapter) Send(ctx context.Context, msg dto.Content) error {
 	// 1) Fallback parse-mode
 	if msg.ParseMode == "" {
 		msg.ParseMode = tgbotapi.ModeHTML
 	}
 
 	// 2) Pick icon
-	levelIcon := map[Level]string{
-		Debug:   "🔍",
-		Info:    "ℹ️",
-		Warning: "⚠️",
-		Error:   "❌",
+	levelIcon := map[dto.Level]string{
+		dto.Debug:   "🔍",
+		dto.Info:    "ℹ️",
+		dto.Warning: "⚠️",
+		dto.Error:   "❌",
 	}[msg.Level]
 	if levelIcon == "" {
 		levelIcon = "📢"

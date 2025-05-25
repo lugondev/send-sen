@@ -81,6 +81,7 @@ type BrevoConfig struct {
 
 // Config stores all configuration of the application.
 type Config struct {
+	Log      LogConfig      `mapstructure:"log"`
 	Adapter  AdapterConfig  `mapstructure:"adapter"`
 	SendGrid SendGridConfig `mapstructure:"sendgrid"`
 	Twilio   TwilioConfig   `mapstructure:"twilio"`

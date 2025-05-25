@@ -4,28 +4,31 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	adapter "github.com/lugondev/send-sen/adapters/email"
 	"html/template"
 
-	"github.com/lugondev/go-log"
+	adapter "github.com/lugondev/send-sen/adapters/email"
+	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/domain/ports"
+
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
 )
 
 // emailService implements the Service interface.
 type emailService struct {
-	adapter Adapter
+	adapter ports.EmailAdapter
 	logger  logger.Logger
 	name    config.EmailProvider
 }
 
 // NewEmailService creates a new instance of Service.
-func NewEmailService(cfg config.Config, logger logger.Logger) (Service, error) {
+func NewEmailService(cfg config.Config, logger logger.Logger) (ports.EmailService, error) {
 	ctx := context.Background()
 	logger.Debug(ctx, "Registered email adapter", map[string]any{
 		"adapter": cfg.Adapter.Email,
 	})
 
-	var emailAdapter Adapter
+	var emailAdapter ports.EmailAdapter
 	if cfg.Adapter.Email == config.EmailBrevo {
 		brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, logger)
 		if err != nil {
@@ -62,7 +65,7 @@ func NewEmailService(cfg config.Config, logger logger.Logger) (Service, error) {
 }
 
 // SendEmail delegates the email sending task to the configured adapter.
-func (s *emailService) SendEmail(ctx context.Context, message adapter.Email) error {
+func (s *emailService) SendEmail(ctx context.Context, message dto.Email) error {
 	if len(message.To) == 0 {
 		return fmt.Errorf("message must have at least one recipient")
 	}
@@ -115,7 +118,7 @@ func (s *emailService) SendPasswordReset(ctx context.Context, to string, link st
 	}
 
 	// Create the email message
-	message := adapter.Email{
+	message := dto.Email{
 		To:      []string{to},
 		Subject: "Password Reset Request",
 		Html:    html,
@@ -140,7 +143,7 @@ func (s *emailService) SendVerificationCode(ctx context.Context, to string, code
 	}
 
 	// Create the email message
-	message := adapter.Email{
+	message := dto.Email{
 		To:      []string{to},
 		Subject: "Your Verification Code",
 		Html:    html,
@@ -165,7 +168,7 @@ func (s *emailService) SendWelcome(ctx context.Context, to string, name string) 
 	}
 
 	// Create the email message
-	message := adapter.Email{
+	message := dto.Email{
 		To:      []string{to},
 		Subject: "Welcome to MyService!",
 		Html:    html,
@@ -191,7 +194,7 @@ func (s *emailService) SendWarningLogin(ctx context.Context, to string, location
 	}
 
 	// Create the email message
-	message := adapter.Email{
+	message := dto.Email{
 		To:      []string{to},
 		Subject: "Security Alert: New Login Detected",
 		Html:    html,

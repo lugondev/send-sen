@@ -5,8 +5,9 @@ import (
 	"fmt"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
 	"github.com/samber/lo"
 )
 
@@ -44,7 +45,7 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (*BrevoAdapte
 }
 
 // SendEmail sends an email using the Brevo API.
-func (a *BrevoAdapter) SendEmail(ctx context.Context, email Email) error {
+func (a *BrevoAdapter) SendEmail(ctx context.Context, email dto.Email) error {
 	a.logger.Info(ctx, "Attempting to send email via Brevo", map[string]any{
 		"subject": email.Subject,
 		"to":      email.To,

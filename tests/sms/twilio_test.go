@@ -2,10 +2,12 @@ package sms_test
 
 import (
 	"context"
-	adapter "github.com/lugondev/send-sen/adapters/sms"
 	"testing"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
+	adapter "github.com/lugondev/send-sen/adapters/sms"
+	"github.com/lugondev/send-sen/domain/dto"
+
 	"github.com/lugondev/send-sen/config"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +28,7 @@ func TestTwilioAdapter_SendSMS(t *testing.T) {
 	twilioAdapter, err := adapter.NewTwilioAdapter(cfg.Twilio, log)
 	assert.NoError(t, err)
 
-	sms := adapter.SMS{
+	sms := dto.SMS{
 		To:      "+18777804236", // Example number
 		Message: "Test SMS from Twilio 123123",
 	}

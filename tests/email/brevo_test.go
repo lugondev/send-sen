@@ -2,10 +2,12 @@ package email
 
 import (
 	"context"
-	"github.com/lugondev/send-sen/adapters/email"
 	"testing"
 
-	"github.com/lugondev/go-log"
+	"github.com/lugondev/send-sen/adapters/email"
+	"github.com/lugondev/send-sen/domain/dto"
+
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
 	"github.com/stretchr/testify/assert"
 )
@@ -28,7 +30,7 @@ func TestNewBrevoAdapter(t *testing.T) {
 	assert.NotNil(t, brevoAdapter, "Brevo adapter should not be nil")
 
 	// Create a message using the adapter's Email type
-	err = brevoAdapter.SendEmail(context.Background(), email.Email{
+	err = brevoAdapter.SendEmail(context.Background(), dto.Email{
 		To:      []string{"lugondev@gmail.com"},
 		Subject: "Test Message",
 		Body:    "This is a test email",

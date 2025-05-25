@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
+	"github.com/lugondev/send-sen/domain/dto"
 )
 
 // MockLogAdapter implements the port.NotifyAdapter interface by logging notifications.
@@ -24,17 +25,17 @@ func NewMockLogAdapter(logger logger.Logger) *MockLogAdapter {
 }
 
 // Send logs the notification details.
-func (a *MockLogAdapter) Send(ctx context.Context, msg Content) error {
+func (a *MockLogAdapter) Send(ctx context.Context, msg dto.Content) error {
 	// Get level-specific icon
 	var levelIcon string
 	switch msg.Level {
-	case Debug:
+	case dto.Debug:
 		levelIcon = "[DEBUG]"
-	case Info:
+	case dto.Info:
 		levelIcon = "[INFO]"
-	case Warning:
+	case dto.Warning:
 		levelIcon = "[WARNING]"
-	case Error:
+	case dto.Error:
 		levelIcon = "[ERROR]"
 	default:
 		levelIcon = "[NOTIFICATION]"

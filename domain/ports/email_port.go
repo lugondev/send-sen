@@ -1,18 +1,19 @@
-package email
+package ports
 
 import (
 	"context"
-	adapter "github.com/lugondev/send-sen/adapters/email"
+
+	"github.com/lugondev/send-sen/domain/dto"
 )
 
 // Adapter defines the interface for sending emails via different providers.
-type Adapter interface {
-	SendEmail(ctx context.Context, email adapter.Email) error
+type EmailAdapter interface {
+	SendEmail(ctx context.Context, email dto.Email) error
 }
 
 // Service defines the core logic for handling emails.
-type Service interface {
-	SendEmail(ctx context.Context, email adapter.Email) error
+type EmailService interface {
+	SendEmail(ctx context.Context, email dto.Email) error
 	SendPasswordReset(ctx context.Context, to string, link string) error
 	SendVerificationCode(ctx context.Context, to string, code string) error
 	SendWelcome(ctx context.Context, to string, name string) error

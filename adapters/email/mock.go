@@ -4,7 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
+	"github.com/lugondev/send-sen/domain/dto"
 )
 
 // MockEmailAdapter is a mock implementation of the port.EmailAdapter interface.
@@ -26,7 +27,7 @@ func NewMockEmailAdapter(logger logger.Logger) *MockEmailAdapter {
 }
 
 // SendEmail sends an email using the mock implementation.
-func (a *MockEmailAdapter) SendEmail(ctx context.Context, email Email) error {
+func (a *MockEmailAdapter) SendEmail(ctx context.Context, email dto.Email) error {
 	// Placeholder implementation (remove once real implementation is added)
 	a.logger.Warn(ctx, "Mock SendEmail function is not fully implemented yet.")
 	fmt.Printf("--- MOCK Brevo Send ---\nTo: %v\nCc: %v\nBcc: %v\nSubject: %s\nBody: %s\n-----------------------\n",

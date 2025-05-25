@@ -3,28 +3,31 @@ package notify
 import (
 	"context"
 	"fmt"
-	adapter "github.com/lugondev/send-sen/adapters/notify"
 
-	"github.com/lugondev/go-log"
+	adapter "github.com/lugondev/send-sen/adapters/notify"
+	"github.com/lugondev/send-sen/domain/dto"
+	"github.com/lugondev/send-sen/domain/ports"
+
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
 )
 
 // notifyService implements the Service interface.
 // It holds a map of registered adapters keyed by channel name.
 type notifyService struct {
-	adapter Adapter
+	adapter ports.NotifyAdapter
 	logger  logger.Logger
 	name    config.NotifyChannel
 }
 
 // NewNotifyService creates a new instance of Service.
-func NewNotifyService(cfg config.Config, logger logger.Logger) (Service, error) {
+func NewNotifyService(cfg config.Config, logger logger.Logger) (ports.NotifyService, error) {
 	ctx := context.Background()
 	logger.Debug(ctx, "Registered notify adapter", map[string]any{
 		"channel": cfg.Adapter.Notify,
 	})
 
-	var notifyAdapter Adapter
+	var notifyAdapter ports.NotifyAdapter
 	if cfg.Adapter.Notify == config.NotifyTelegram {
 		telegramAdapter, err := adapter.NewTelegramAdapter(cfg.Telegram, logger)
 		if err != nil {
@@ -56,7 +59,7 @@ func NewNotifyService(cfg config.Config, logger logger.Logger) (Service, error) 
 }
 
 // Send finds the appropriate adapter based on the notification's channel
-func (s *notifyService) Send(ctx context.Context, content adapter.Content) error {
+func (s *notifyService) Send(ctx context.Context, content dto.Content) error {
 	if content.Message == "" {
 		return fmt.Errorf("notification message cannot be empty")
 	}
@@ -80,27 +83,27 @@ func (s *notifyService) Send(ctx context.Context, content adapter.Content) error
 
 // Alert sends a notification with Error level
 func (s *notifyService) Alert(ctx context.Context, subject, message string) error {
-	content := adapter.Content{
+	content := dto.Content{
 		Subject: subject,
 		Message: message,
-		Level:   adapter.Error,
+		Level:   dto.Error,
 	}
 	return s.Send(ctx, content)
 }
 
 // Info sends a notification with Info level
 func (s *notifyService) Info(ctx context.Context, subject, message string) error {
-	content := adapter.Content{
+	content := dto.Content{
 		Subject: subject,
 		Message: message,
-		Level:   adapter.Info,
+		Level:   dto.Info,
 	}
 	return s.Send(ctx, content)
 }
 
 // Notify sends a notification with the specified level
-func (s *notifyService) Notify(ctx context.Context, subject, message string, level adapter.Level) error {
-	content := adapter.Content{
+func (s *notifyService) Notify(ctx context.Context, subject, message string, level dto.Level) error {
+	content := dto.Content{
 		Subject: subject,
 		Message: message,
 		Level:   level,

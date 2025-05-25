@@ -2,10 +2,12 @@ package sms_test
 
 import (
 	"context"
-	adapter "github.com/lugondev/send-sen/adapters/sms"
 	"testing"
 
-	"github.com/lugondev/go-log"
+	adapter "github.com/lugondev/send-sen/adapters/sms"
+	"github.com/lugondev/send-sen/domain/dto"
+
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
 	"github.com/stretchr/testify/assert"
 )
@@ -26,7 +28,7 @@ func TestBrevoAdapter_SendSMS(t *testing.T) {
 	brevoAdapter, err := adapter.NewBrevoAdapter(cfg.Brevo, log)
 	assert.NoError(t, err)
 
-	sms := adapter.SMS{
+	sms := dto.SMS{
 		To:      "+84909123456", // Example Vietnamese number
 		Message: "Test SMS from Brevo 123123",
 	}

@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
 	"github.com/twilio/twilio-go"
 	twilioApi "github.com/twilio/twilio-go/rest/api/v2010"
 )
@@ -46,7 +47,7 @@ func NewTwilioAdapter(cfg config.TwilioConfig, logger logger.Logger) (*TwilioAda
 }
 
 // Send sends an SMS using the Twilio Messages API.
-func (a *TwilioAdapter) Send(ctx context.Context, sms SMS) error {
+func (a *TwilioAdapter) Send(ctx context.Context, sms dto.SMS) error {
 	params := &twilioApi.CreateMessageParams{
 		To:   &sms.To,
 		From: &a.cfg.FromNumber,

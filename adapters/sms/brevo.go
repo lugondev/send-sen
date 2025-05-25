@@ -5,8 +5,9 @@ import (
 	"fmt"
 
 	brevo "github.com/getbrevo/brevo-go/lib"
-	"github.com/lugondev/go-log"
+	logger "github.com/lugondev/go-log"
 	"github.com/lugondev/send-sen/config"
+	"github.com/lugondev/send-sen/domain/dto"
 )
 
 // BrevoAdapter implements the port.SmsAdapter interface for sending SMS via Brevo (formerly SendinBlue).
@@ -39,7 +40,7 @@ func NewBrevoAdapter(cfg config.BrevoConfig, logger logger.Logger) (*BrevoAdapte
 }
 
 // Send sends an SMS using the Brevo API.
-func (a *BrevoAdapter) Send(ctx context.Context, sms SMS) error {
+func (a *BrevoAdapter) Send(ctx context.Context, sms dto.SMS) error {
 	a.logger.Info(ctx, "Attempting to send SMS via Brevo", map[string]any{
 		"to":      sms.To,
 		"from":    a.cfg.SMSSender,

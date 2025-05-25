@@ -1,4 +1,4 @@
-package notify
+package dto
 
 type Level string
 

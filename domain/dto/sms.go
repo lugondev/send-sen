@@ -1,4 +1,4 @@
-package sms
+package dto
 
 // SMS represents the data structure for an SMS message.
 type SMS struct {

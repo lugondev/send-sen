@@ -1,4 +1,4 @@
-package email
+package dto
 
 type Email struct {
 	To      []string
